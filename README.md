@@ -10,17 +10,22 @@ You can compile `rmapper` executing `make` in the main directory.
 After compiling, you can build the bi-labelled de Bruijn graph using
 
 ``` bash
-./bin/rmapper \
-<error-corrected rmaps in valouev format> \
-<size of the k-mers> \
-<minimum k-mer distance in a bi-label> \
-<t_f>
-```
+./rmapper-build infile [-k ksize] [-d dsize] [-f tf] [-l tl] [-r rev] [-o output]
 
+Computes the bi-labelled de Bruijn graph of the error-corrected rmaps in [infile].
+  ksize: [integer] - k-mer size (def. 6)
+  dsize: [integer] - minimum distance between two k-mers in a bi-label. (def. 15000)
+     tf: [integer] - fragment proximal error tollerance. (def. 500)
+     tl: [integer] - length proximal error tollerance. (def. 2000)
+    rev: [boolean] - include reverse rmaps. (def. false)
+ output: [string]  - output directory that must exists. (def. .)
+```
 Then the graph can be traversed using
 
 ``` bash
-./traverse
+./rmapper-traverse indir
+
+Traverse the bi-labelled de Bruijn graph in the directory [indir].
 ```
 
 ## Examples
@@ -34,8 +39,9 @@ wget -O ecoli_corrected.val 'https://docs.google.com/uc?export=download&id=1SUt7
 ```
 Build and traverse the graph
 ``` bash
-./bin/rmapper ecoli_corrected.val 6 15000 500
-./traverse
+mkdir ecoli_output
+./rmapper-build ecoli_corrected.val -k 6 -d 15000 -f 500 -o ecoli_output/
+./rmapper-traverse ecoli_output/
 ```
 
 <!--- 
@@ -49,8 +55,9 @@ wget -O human_corrected.val 'https://docs.google.com/uc?export=download&id=1mCXT
 ```
 Build and traverse the graph
 ``` bash
-./bin/rmapper ecoli_corrected.val 6 25000 1500
-./traverse
+mkdir human_output
+./rmapper-build ecoli_corrected.val -k 6 -d 25000 -f 1500 -o human_output/
+./rmapper-traverse human_output/
 ```
 <!---
 wget -O human_sim.out 'https://docs.google.com/uc?export=download&id=1zUTJr6hv3Lj5deUG2tmWJoRL-zkCfpuH'

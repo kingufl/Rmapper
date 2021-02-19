@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <cmath>
 #include <map>
@@ -14,7 +15,8 @@
 #include <stdlib.h>
 #include <typeinfo>
 #include <string>
- #include <climits>
+#include <climits>
+#include <unistd.h>
 
 #include "KDTree.hpp"
 
@@ -261,16 +263,90 @@ int max(int a,int b){
         return b;
 }
 
+//*********************** Argument options ***************************************
+// struct containing command line parameters and other globals
+struct Args
+{
+  std::string filename = "";
+  size_t k = 6;     // k-mer size
+  size_t d = 15000; // min distance between two k-mers in a bi-label
+  size_t tf = 500;   // fragment proximal error tollerance
+  size_t tl = 2000;  // length proximal error tollerance
+  bool rev = false; // outpt RLBWT
+  std::string output = "."; // path to output directory
+};
+
+void parseArgs(int argc, char *const argv[], Args &arg)
+{
+  int c;
+  extern char *optarg;
+  extern int optind;
+
+  std::string usage("usage: " + std::string(argv[0]) + " infile [-k ksize] [-d dsize] [-f tf] [-l tl] [-r rev] [-o output]\n\n" +
+                    "Computes the bi-labelled de Bruijn graph of the error-corrected rmaps in [infile].\n" +
+                    "  ksize: [integer] - k-mer size (def. 6)\n" +
+                    "  dsize: [integer] - minimum distance between two k-mers in a bi-label. (def. 15000)\n" +
+                    "     tf: [integer] - fragment proximal error tollerance. (def. 500)\n" +
+                    "     tl: [integer] - length proximal error tollerance. (def. 2000)\n" +
+                    "    rev: [boolean] - include reverse rmaps. (def. false)\n" +
+                    " output: [string]  - output directory that must exists. (def. .)\n");
+
+  std::string sarg;
+  while ((c = getopt(argc, argv, "k:d:f:l:ro:")) != -1)
+  {
+    switch (c)
+    {
+    case 'k':
+      sarg.assign(optarg);
+      arg.k = stoi(sarg);
+      break;
+    case 'd':
+      sarg.assign(optarg);
+      arg.d = stoi(sarg);
+      break;
+    case 'f':
+      sarg.assign(optarg);
+      arg.tf = stoi(sarg);
+      break;
+    case 'l':
+      sarg.assign(optarg);
+      arg.tl = stoi(sarg);
+      break;
+    case 'r':
+      arg.rev = true;
+      break;
+    case 'o':
+      arg.output.assign(optarg);
+      break;
+    case 'h':
+      cerr << usage;
+      exit(1);
+    case '?':
+      cerr << "Unknown option.\n" << usage;
+      exit(1);
+    }
+  }
+  // the only input parameter is the file name
+  if (argc == optind + 1)
+  {
+    arg.filename.assign(argv[optind]);
+  }
+  else
+  {
+    cerr << "Invalid number of arguments\n" << usage;
+    exit(1);
+  }
+}
+
 
 int main(int argc, char *argv[]){
 
-    if(argc<4){
-        cout<<"usage: ./buildgraph <rmap_file.val> <kmer_size> <dsize> <t_f>"<<endl;
-        return(1);
-	}
+    Args args;
+    parseArgs(argc, argv, args);
 
-	int t_sum = 2000;
-	int t_frag = atoi(argv[4]);
+
+	int t_sum = args.tl;
+	int t_frag = args.tf;
 
 	int t_nmerge=1500;
 
@@ -278,15 +354,15 @@ int main(int argc, char *argv[]){
 
     int minmerge=10,maxmerge=1000;
 
-	int dsize=atoi(argv[3]);
+	int dsize=args.d;
 
-    int kmer_size = atoi(argv[2]);
+    int kmer_size = args.k;
 
-    ofstream bilabelout("bilabels_from_data.txt");
-    ofstream prefix_suffix("prefix_suffix.txt");
-    ofstream rmapsfile("rmaps.txt");
+    ofstream bilabelout(args.output + "/bilabels_from_data.txt");
+    ofstream prefix_suffix(args.output + "/prefix_suffix.txt");
+    ofstream rmapsfile(args.output + "/rmaps.txt");
 
-    ifstream infile(argv[1]);
+    ifstream infile(args.filename);
 
     map <string,int> nameid;
     int lastname=0;
@@ -728,7 +804,7 @@ int main(int argc, char *argv[]){
 
     cout<<"Trees built: "<<trees_built<<endl;
 
-    ofstream bilmerge("bilabel_merges.txt");
+    ofstream bilmerge(args.output + "/bilabel_merges.txt");
 
     vector< vector <int> > bilabel_merges(all_bilabels.size());
 
@@ -864,7 +940,7 @@ int main(int argc, char *argv[]){
 
     minmerge=4;maxmerge=2000;
 
-    t_frag=1000;
+    t_frag=1000; // Why t_frag is reset here?
     t_nmerge=1000;
     cutoff_freq=4,supp=4;
 
@@ -872,7 +948,7 @@ int main(int argc, char *argv[]){
     vector<KDTree>().swap(alltrees);
 
     infile.close();
-    infile.open("bilabel_merges.txt");
+    infile.open(args.output + "/bilabel_merges.txt");
 
     vector<int> selected;
 
@@ -1226,7 +1302,7 @@ int main(int argc, char *argv[]){
 
     vector<int> final_nodes;
 
-    ofstream graph_nodes("graph.txt");
+    ofstream graph_nodes(args.output + "/graph.txt");
 
 //    ofstream nodemerges("nodemerges.txt");
 
@@ -1408,9 +1484,9 @@ int main(int argc, char *argv[]){
     cout<<"Num nodes trimmed: "<<trim_del<<endl;
     cout<<"Num prefixes trimmed: "<<prefix_trim<<endl;
 
-    ofstream graphrev("graph_rev.txt");
+    ofstream graphrev(args.output + "/graph_rev.txt");
 
-    ofstream indees("indegrees.txt");
+    ofstream indees(args.output + "/indegrees.txt");
 
     vector<int> indegrees(1000,0);
 
