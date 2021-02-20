@@ -28,6 +28,24 @@ Then the graph can be traversed using
 Traverse the bi-labelled de Bruijn graph in the directory [indir].
 ```
 
+## Input format
+
+The input format `[NAME_FILE].val` stores each rmap in three lines. The first line contains the Rmap ID, the second line contains the restriction enzyme used, followed by the Rmap fragments in kbp.
+
+Example:
+
+``` 
+Rmap_0
+        27 enzyme 3.262 7.618 11.667 15.579 10.687 7.727 26.177 3.523 7.565 18.481 4.317 28.016 11.942 21.72 27.698 8.206 1.521 4.169 4.631 4.052 10.489 10.098 3.471 6.938 3.137 16.248 9.69 
+
+Rmap_1
+        24 enzyme 4.476 2.264 16.449 16.598 1.881 7.788 12.494 16.856 4.746 3.001 12.706 2.923 6.043 1.639 16.368 7.555 14.451 6.346 9.003 9.625 10.428 7.868 5.059 8.693 
+
+Rmap_2
+        24 enzyme 11.047 20.374 1.801 9.055 4.151 6.723 6.537 4.25 4.446 3.899 4.517 9.679 16.132 3.104 6.893 5.008 9.827 10.458 4.102 4.647 4.084 1.537 8.192 9.935 
+
+```
+
 ## Examples
 
 You can download the example data from [here](https://drive.google.com/drive/folders/1CxYtVUTEYq4CybTHCxfyj9E4jNCWd_Xt?usp=sharing) using
@@ -50,6 +68,7 @@ wget -O ecoli.bnx 'https://docs.google.com/uc?export=download&id=1Erd0WlRnHhvtvA
 --->
 
 ### *Human* simulated rmaps 
+Download the rmaps
 ``` bash
 wget -O human_corrected.val 'https://docs.google.com/uc?export=download&id=1mCXT67lwB2Zh0FCnoIX_DTP2k7ZK51vE'
 ```

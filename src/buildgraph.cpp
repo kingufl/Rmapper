@@ -556,104 +556,107 @@ int main(int argc, char *argv[]){
 
 
  //---------------------------------------------------------------------------------------
-        rmap_name=rmap_name+"_r";
-        temp=temp_rev;
-        temp_sum=temp_sum_rev;
+        if(args.rev){
+    
+            rmap_name=rmap_name+"_r";
+            temp=temp_rev;
+            temp_sum=temp_sum_rev;
 
-        bilabels_from_this_rmap = extract_bilabels(kmer_size, dsize, starts[0], temp, temp_sum, orientation[0], chromosome[0], rmap_name,rmap_cnt);
+            bilabels_from_this_rmap = extract_bilabels(kmer_size, dsize, starts[0], temp, temp_sum, orientation[0], chromosome[0], rmap_name,rmap_cnt);
 
-        for(int ii=0;ii<bilabels_from_this_rmap.size();ii++){
+            for(int ii=0;ii<bilabels_from_this_rmap.size();ii++){
 
-            bilabel tembi=extract_one_bilabel(bilabels_from_this_rmap[ii].i_rmap, kmer_size-1, dsize, starts[0], temp, temp_sum, orientation[0], chromosome[0], rmap_name,rmap_cnt);
-            ps_bilabels.push_back(tembi);
+                bilabel tembi=extract_one_bilabel(bilabels_from_this_rmap[ii].i_rmap, kmer_size-1, dsize, starts[0], temp, temp_sum, orientation[0], chromosome[0], rmap_name,rmap_cnt);
+                ps_bilabels.push_back(tembi);
 
-            prefix_suffix<<"bi_"<<pre_suf_cnt++<<" "<<tembi.rmap_from<<" "<<tembi.i_rmap<<" "<<tembi.q_rmap<<" "<<tembi.locus<<" "<<tembi.chromosome<<" "<<tembi.orientation<<" ";
-            for(int iii=0;iii<3;iii++){
-                prefix_suffix<<" d"<<iii+1<<": "<<tembi.sums[iii]<<" ";
+                prefix_suffix<<"bi_"<<pre_suf_cnt++<<" "<<tembi.rmap_from<<" "<<tembi.i_rmap<<" "<<tembi.q_rmap<<" "<<tembi.locus<<" "<<tembi.chromosome<<" "<<tembi.orientation<<" ";
+                for(int iii=0;iii<3;iii++){
+                    prefix_suffix<<" d"<<iii+1<<": "<<tembi.sums[iii]<<" ";
+                }
+
+                prefix_suffix<<" km1: ";
+
+                for(int iii=tembi.i_rmap;iii<tembi.i_rmap+kmer_size-1;iii++){
+                    prefix_suffix<<temp[iii]<<" ";
+                }
+
+                prefix_suffix<<" km2: ";
+
+                for(int iii=tembi.q_rmap+1;iii<tembi.q_rmap+kmer_size-1+1;iii++){
+                    prefix_suffix<<temp[iii]<<" ";
+                }
+
+                prefix_suffix<<endl;
+
+
+                tembi=extract_one_bilabel(bilabels_from_this_rmap[ii].i_rmap+1, kmer_size-1, dsize, starts[0], temp, temp_sum, orientation[0], chromosome[0], rmap_name,rmap_cnt);
+                ps_bilabels.push_back(tembi);
+
+
+                prefix_suffix<<"bi_"<<pre_suf_cnt++<<" "<<tembi.rmap_from<<" "<<tembi.i_rmap<<" "<<tembi.q_rmap<<" "<<tembi.locus<<" "<<tembi.chromosome<<" "<<tembi.orientation<<" ";
+                for(int iii=0;iii<3;iii++){
+                    prefix_suffix<<" d"<<iii+1<<": "<<tembi.sums[iii]<<" ";
+                }
+
+                prefix_suffix<<" km1: ";
+
+                for(int iii=tembi.i_rmap;iii<tembi.i_rmap+kmer_size-1;iii++){
+                    prefix_suffix<<temp[iii]<<" ";
+                }
+
+                prefix_suffix<<" km2: ";
+
+                for(int iii=tembi.q_rmap+1;iii<tembi.q_rmap+kmer_size-1+1;iii++){
+                    prefix_suffix<<temp[iii]<<" ";
+                }
+
+                prefix_suffix<<endl;
+
+
+                bilabelout<<"bi_"<<bicnt++<<" "<<bilabels_from_this_rmap[ii].rmap_from<<" "<<bilabels_from_this_rmap[ii].i_rmap<<" "<<bilabels_from_this_rmap[ii].q_rmap<<" "<<bilabels_from_this_rmap[ii].locus<<" "<<bilabels_from_this_rmap[ii].chromosome<<" "<<bilabels_from_this_rmap[ii].orientation<<" ";
+                for(int iii=0;iii<3;iii++){
+                    bilabelout<<" d"<<iii+1<<": "<<bilabels_from_this_rmap[ii].sums[iii]<<" ";
+                }
+
+                tembi=bilabels_from_this_rmap[ii];
+
+                bilabelout<<" km1: ";
+
+                for(int iii=tembi.i_rmap;iii<tembi.i_rmap+kmer_size;iii++){
+                    bilabelout<<temp[iii]<<" ";
+                }
+
+                bilabelout<<" km2: ";
+
+                for(int iii=tembi.q_rmap+1;iii<tembi.q_rmap+kmer_size+1;iii++){
+                    bilabelout<<temp[iii]<<" ";
+                }
+
+                bilabelout<<endl;
+
             }
 
-            prefix_suffix<<" km1: ";
 
-            for(int iii=tembi.i_rmap;iii<tembi.i_rmap+kmer_size-1;iii++){
-                prefix_suffix<<temp[iii]<<" ";
+            rmapsfile<<rmap_name<<endl;
+            for(int ii=0;ii<temp.size();ii++){
+                rmapsfile<<temp[ii]<<" ";
+            }
+            rmapsfile<<endl;
+            for(int ii=0;ii<temp_sum.size();ii++){
+                rmapsfile<<temp_sum[ii]<<" ";
             }
 
-            prefix_suffix<<" km2: ";
-
-            for(int iii=tembi.q_rmap+1;iii<tembi.q_rmap+kmer_size-1+1;iii++){
-                prefix_suffix<<temp[iii]<<" ";
-            }
-
-            prefix_suffix<<endl;
+            rmapsfile<<endl<<endl;
 
 
-            tembi=extract_one_bilabel(bilabels_from_this_rmap[ii].i_rmap+1, kmer_size-1, dsize, starts[0], temp, temp_sum, orientation[0], chromosome[0], rmap_name,rmap_cnt);
-            ps_bilabels.push_back(tembi);
+            all_bilabels.insert(all_bilabels.end(),bilabels_from_this_rmap.begin(),bilabels_from_this_rmap.end());
 
+            rmap.push_back(temp);
+            rmap_sum.push_back(temp_sum);
 
-            prefix_suffix<<"bi_"<<pre_suf_cnt++<<" "<<tembi.rmap_from<<" "<<tembi.i_rmap<<" "<<tembi.q_rmap<<" "<<tembi.locus<<" "<<tembi.chromosome<<" "<<tembi.orientation<<" ";
-            for(int iii=0;iii<3;iii++){
-                prefix_suffix<<" d"<<iii+1<<": "<<tembi.sums[iii]<<" ";
-            }
-
-            prefix_suffix<<" km1: ";
-
-            for(int iii=tembi.i_rmap;iii<tembi.i_rmap+kmer_size-1;iii++){
-                prefix_suffix<<temp[iii]<<" ";
-            }
-
-            prefix_suffix<<" km2: ";
-
-            for(int iii=tembi.q_rmap+1;iii<tembi.q_rmap+kmer_size-1+1;iii++){
-                prefix_suffix<<temp[iii]<<" ";
-            }
-
-            prefix_suffix<<endl;
-
-
-            bilabelout<<"bi_"<<bicnt++<<" "<<bilabels_from_this_rmap[ii].rmap_from<<" "<<bilabels_from_this_rmap[ii].i_rmap<<" "<<bilabels_from_this_rmap[ii].q_rmap<<" "<<bilabels_from_this_rmap[ii].locus<<" "<<bilabels_from_this_rmap[ii].chromosome<<" "<<bilabels_from_this_rmap[ii].orientation<<" ";
-            for(int iii=0;iii<3;iii++){
-                bilabelout<<" d"<<iii+1<<": "<<bilabels_from_this_rmap[ii].sums[iii]<<" ";
-            }
-
-            tembi=bilabels_from_this_rmap[ii];
-
-            bilabelout<<" km1: ";
-
-            for(int iii=tembi.i_rmap;iii<tembi.i_rmap+kmer_size;iii++){
-                bilabelout<<temp[iii]<<" ";
-            }
-
-            bilabelout<<" km2: ";
-
-            for(int iii=tembi.q_rmap+1;iii<tembi.q_rmap+kmer_size+1;iii++){
-                bilabelout<<temp[iii]<<" ";
-            }
-
-            bilabelout<<endl;
+            rmap_cnt++;
 
         }
-
-
-        rmapsfile<<rmap_name<<endl;
-        for(int ii=0;ii<temp.size();ii++){
-            rmapsfile<<temp[ii]<<" ";
-        }
-        rmapsfile<<endl;
-        for(int ii=0;ii<temp_sum.size();ii++){
-            rmapsfile<<temp_sum[ii]<<" ";
-        }
-
-        rmapsfile<<endl<<endl;
-
-
-        all_bilabels.insert(all_bilabels.end(),bilabels_from_this_rmap.begin(),bilabels_from_this_rmap.end());
-
-        rmap.push_back(temp);
-        rmap_sum.push_back(temp_sum);
-
-        rmap_cnt++;
-
 
  //---------------------------------------------------------------------------------------
 
