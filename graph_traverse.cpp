@@ -150,14 +150,44 @@ void DFS_trim(int source, int thisnode, int thislvl, int toplvl){
 
 }
 
+//*********************** Argument options ***************************************
+// struct containing command line parameters and other globals
+struct Args
+{
+  std::string dirname = ".";
+};
+
+void parseArgs(int argc, char *const argv[], Args &arg)
+{
+  int c;
+  extern char *optarg;
+  extern int optind;
+
+  std::string usage("usage: " + std::string(argv[0]) + " indir\n\n" +
+                    "Traverse the bi-labelled de Bruijn graph in the directory [indir].\n");
+
+  // the only input parameter is the directory name
+  if (argc == 2)
+  {
+    arg.dirname.assign(argv[1]);
+  }
+  else
+  {
+    cerr << "Invalid number of arguments\n" << usage;
+    exit(1);
+  }
+}
 
 
 int main(int argc, char *argv[]){
 
 
+    Args args;
+    parseArgs(argc, argv, args);
 
-    ifstream infile1("graph.txt");
-    ifstream infile2("graph_rev.txt");
+
+    ifstream infile1(args.dirname + "/graph.txt");
+    ifstream infile2(args.dirname + "/graph_rev.txt");
 
     vector<vector<int> > fwd,rev;
     map<string,int> nodemap;
@@ -175,7 +205,7 @@ int main(int argc, char *argv[]){
 
     vector<int> fwd_deeg(100,0);
 
-    ofstream notenodes("nodenotes.txt");
+    ofstream notenodes(args.dirname + "/nodenotes.txt");
 
     vector<string> storeallstr;
 
@@ -273,7 +303,7 @@ int main(int argc, char *argv[]){
     int countextra=0,oneoutmorein=0;
     vector<int> singleton;
 
-    ofstream graphcut("graphcut.txt");
+    ofstream graphcut(args.dirname + "/graphcut.txt");
 
 
     for(int i=0;i<stringfwd.size();i++){
@@ -327,7 +357,7 @@ int main(int argc, char *argv[]){
 
     int maxlevel=dist;
 
-    ofstream maxreached("maxreached.txt");
+    ofstream maxreached(args.dirname + "/maxreached.txt");
 
     int resolved=0;
 
@@ -344,8 +374,8 @@ int main(int argc, char *argv[]){
 
     kmersize = (nodefrag[0].size()-1)/2;
 
-    ofstream finalcons("assembly.txt");
-    ofstream outnodes("connodes.txt");
+    ofstream finalcons(args.dirname + "/assembly.txt");
+    ofstream outnodes(args.dirname + "/connodes.txt");
 
 
     int longestcon=0,totlen=0;
